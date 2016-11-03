@@ -1,4 +1,4 @@
-package com.userfulness.utils.date;
+package com.usefulness.utils.date;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

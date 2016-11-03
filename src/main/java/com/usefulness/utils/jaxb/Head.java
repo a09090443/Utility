@@ -1,4 +1,4 @@
-package com.userfulness.utils.jaxb;
+package com.usefulness.utils.jaxb;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

@@ -1,4 +1,4 @@
-package com.userfulness.utils.jaxb;
+package com.usefulness.utils.jaxb;
 
 import java.util.List;
 import java.util.Set;
