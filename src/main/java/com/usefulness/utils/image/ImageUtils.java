@@ -1,4 +1,4 @@
-package com.userulness.utils.image;
+package com.usefulness.utils.image;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
