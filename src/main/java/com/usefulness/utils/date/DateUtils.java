@@ -2,11 +2,25 @@ package com.usefulness.utils.date;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 public class DateUtils {
+
+	public static final String SUNDAY = "SUNDAY";
+	public static final String MONDAY = "MONDAY";
+	public static final String TUESDAY = "TUESDAY";
+	public static final String WEDNESDAY = "WEDNESDAY";
+	public static final String THURSDAY = "THURSDAY";
+	public static final String FRIDAY = "FRIDAY";
+	public static final String SATURDAY = "SATURDAY";
 
 	public static enum Type {
 		Year, Month, Week, Day, Hour, Minutes, Seconds;
@@ -131,6 +145,54 @@ public class DateUtils {
 	}
 
 	/**
+	 * 獲取指定日期之前或者之後多少週的日期
+	 *
+	 * @param day
+	 *            指定的時間
+	 * @param offset
+	 *            日期偏移量，正數表示延後，負數表示天前
+	 * @return Date
+	 */
+	public static Date getWeekByOffset(Date day, int offset) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(day);
+		c.add(Calendar.WEEK_OF_MONTH, offset);
+		return c.getTime();
+	}
+
+	/**
+	 * 獲取指定日期之前或者之後多少月的日期
+	 *
+	 * @param month
+	 *            指定的時間
+	 * @param offset
+	 *            日期偏移量，正數表示延後，負數表示月前
+	 * @return Date
+	 */
+	public static Date getMonthByOffset(Date day, int offset) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(day);
+		c.add(Calendar.MONTH, offset);
+		return c.getTime();
+	}
+
+	/**
+	 * 獲取指定日期之前或者之後多少月的日期
+	 *
+	 * @param month
+	 *            指定的時間
+	 * @param offset
+	 *            日期偏移量，正數表示延後，負數表示月前
+	 * @return Date
+	 */
+	public static Date getYearByOffset(Date day, int offset) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(day);
+		c.add(Calendar.YEAR, offset);
+		return c.getTime();
+	}
+
+	/**
 	 * 獲取一天開始時間 如 2014-12-12 00:00:00
 	 *
 	 * @return
@@ -246,7 +308,7 @@ public class DateUtils {
 	 * @param date1
 	 *            第一個日期
 	 * @param date2
-	 *            第二個日期<font color="red">此日期必須在date1之後</font>
+	 *            第二個日期
 	 * @param type
 	 *            DateUtils.Type.X的枚舉類型
 	 * @return long值
@@ -370,12 +432,89 @@ public class DateUtils {
 		}
 	}
 
+	/**
+	 * 獲取某個日期的當週第一天
+	 *
+	 * @return
+	 */
+	public static Date getFirstDayOfWeek(Date date) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		int dayOfWeek = c.get(Calendar.DAY_OF_WEEK) - c.getFirstDayOfWeek();
+		c.add(Calendar.DAY_OF_MONTH, -dayOfWeek);
+		Date weekStart = c.getTime();
+
+		return weekStart;
+	}
+
+	/**
+	 * 獲取某個日期的當週最後一天
+	 *
+	 * @return
+	 */
+	public static Date getEndDayOfWeek(Date date) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.add(Calendar.DAY_OF_MONTH, 6);
+		Date weekEnd = c.getTime();
+		return weekEnd;
+	}
+
+	/**
+	 * 獲得該日期當月份的每週指定星期
+	 * 
+	 * @param date
+	 * @param weekName
+	 * @return
+	 */
+	public static List<LocalDate> weeksInCalendar(Date date, String weekName) {
+		YearMonth yearMonth = YearMonth.from(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+		List<LocalDate> firstDaysOfWeeks = new ArrayList<LocalDate>();
+		for (LocalDate day = dayOfCalendar(yearMonth, weekName); stillInCalendar(yearMonth,
+				day); day = day.plusWeeks(1)) {
+			firstDaysOfWeeks.add(day);
+		}
+		return firstDaysOfWeeks;
+	}
+
+	private static LocalDate dayOfCalendar(YearMonth month, String weekName) {
+		DayOfWeek DAY_OF_WEEK = null;
+		if (weekName.equals(SUNDAY)) {
+			DAY_OF_WEEK = DayOfWeek.SUNDAY;
+		} else if (weekName.equals(MONDAY)) {
+			DAY_OF_WEEK = DayOfWeek.MONDAY;
+		} else if (weekName.equals(TUESDAY)) {
+			DAY_OF_WEEK = DayOfWeek.TUESDAY;
+		} else if (weekName.equals(WEDNESDAY)) {
+			DAY_OF_WEEK = DayOfWeek.WEDNESDAY;
+		} else if (weekName.equals(THURSDAY)) {
+			DAY_OF_WEEK = DayOfWeek.THURSDAY;
+		} else if (weekName.equals(FRIDAY)) {
+			DAY_OF_WEEK = DayOfWeek.FRIDAY;
+		} else if (weekName.equals(SATURDAY)) {
+			DAY_OF_WEEK = DayOfWeek.SATURDAY;
+		} else {
+			return null;
+		}
+		return month.atDay(1).with(DAY_OF_WEEK);
+	}
+
+	private static boolean stillInCalendar(YearMonth yearMonth, LocalDate day) {
+		return !day.isAfter(yearMonth.atEndOfMonth());
+	}
+
 	public static void main(String[] args) throws Exception {
-		Date d = new Date();
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(d);
-		cal.add(Calendar.MONTH, 1);
-		System.out.println(new SimpleDateFormat("yyyy-MM-dd").format(cal.getTime()));
-		System.out.println(getDiff(d, cal.getTime(), DateUtils.Type.Week));
+		System.out.println(getFormatedDate(new Date(), "yyyy-MM-dd"));
+		// String getTime = DateUtils.getCurrentDate("yyyy-MM-dd hh:mm:ss");
+		// for (int i = 0; i < 20; i++) {
+		// System.out.println(getTime);
+		// }
+		// Date d = new Date();
+		// Calendar cal = Calendar.getInstance();
+		// cal.setTime(d);
+		// cal.add(Calendar.MONTH, 1);
+		// System.out.println(new
+		// SimpleDateFormat("yyyy-MM-dd").format(cal.getTime()));
+		// System.out.println(getDiff(d, cal.getTime(), DateUtils.Type.Week));
 	}
 }
